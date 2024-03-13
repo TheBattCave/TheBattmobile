@@ -22,7 +22,8 @@ Each module has 12 cells.
 #### <Cell Voltages (V)>
 Breaks down the amount of time (in seconds) that each cell 1-12 of that module spent at a corresponding voltage (in Volts).  In bins of 10 kW going from 2V to 4+V. 
 
-#### <Cell Balancers>
+
+#### <Cell Balancer (on/off)>
 Shows the amount of time (in seconds) that the cells of the module were turned on and off to maintain even usage of each cell in the module.
 
 #### <Module Temperatures (deg C)>
