@@ -300,6 +300,29 @@ def move_false_bus(directory):
         bus_file = source + bus_num
         shutil.move(bus_file, destination)
 
+def copy_csv_to_sorted_data():
+    """
+    Copies CSV files from a folder called 'KCM-Raw-Data' and pastes them into a folder called 'sorted_data'.
+
+    """
+    # Define paths
+    source_folder = 'sorted_data/KCM-Raw-Data'
+    destination_folder = 'sorted_data'
+    
+    # Create destination folder if it doesn't exist
+    if not os.path.exists(destination_folder):
+        os.makedirs(destination_folder)
+    
+    # Iterate over files in the source folder
+    for file_name in os.listdir(source_folder):
+        if file_name.endswith('.csv'):
+            # Construct paths for source and destination files
+            source_file_path = os.path.join(source_folder, file_name)
+            destination_file_path = os.path.join(destination_folder, file_name)
+            
+            # Copy file to the destination folder
+            shutil.copyfile(source_file_path, destination_file_path)
+            print(f"Copied: {file_name} to {destination_folder}")
 
 directory = find_directory() + 'Raw Data/'
 unzip_directory = find_directory() + 'sorted_data/'
@@ -311,6 +334,7 @@ else:
     zip_directory = directory + zip_filename
     with zipfile.ZipFile(zip_directory, 'r') as zip_ref:
         zip_ref.extractall(unzip_directory)
-    group_files(unzip_directory)
-    filter_false_module(unzip_directory)
-    move_false_bus(unzip_directory)
+copy_csv_to_sorted_data()
+group_files(unzip_directory)
+filter_false_module(unzip_directory)
+move_false_bus(unzip_directory)

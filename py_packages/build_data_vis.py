@@ -81,8 +81,8 @@ def build_bus_df(directory, bus_num, keyword):
         file = bus_dates['Filename'].loc[i]
         file_dir = directory + bus_num + file
         tmp = pd.read_csv(file_dir, header=None, skiprows=row_list)
-        bus_parameter = bus_parameter.append(tmp)
-    df_index = pd.read_csv(file_dir, header=0, skiprows=index_range)
+        bus_parameter = bus_parameter.append(tmp)    
+        df_index = pd.read_csv(file_dir, header=0, skiprows=index_range)
     bus_parameter.columns = df_index.columns
 
     loc_parameter = bus_parameter.columns.str.contains('^Unnamed')
