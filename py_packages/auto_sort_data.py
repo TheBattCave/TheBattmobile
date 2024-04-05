@@ -326,6 +326,8 @@ def copy_csv_to_sorted_data():
 
 directory = find_directory() + 'Raw Data/'
 unzip_directory = find_directory() + 'sorted_data/'
+annoyingfolder = unzip_directory + 'KCM-Raw-Data/'
+
 if os.path.exists(unzip_directory):
     filter_false_module(unzip_directory)
     move_false_bus(unzip_directory)
@@ -334,7 +336,10 @@ else:
     zip_directory = directory + zip_filename
     with zipfile.ZipFile(zip_directory, 'r') as zip_ref:
         zip_ref.extractall(unzip_directory)
-copy_csv_to_sorted_data()
+    if os.path.exists(annoyingfolder):
+        copy_csv_to_sorted_data()
+    else:
+        pass
 group_files(unzip_directory)
 filter_false_module(unzip_directory)
 move_false_bus(unzip_directory)
