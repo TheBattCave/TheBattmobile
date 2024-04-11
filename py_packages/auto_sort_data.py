@@ -7,7 +7,14 @@ import re
 import shutil
 import zipfile
 from os import listdir
+import sys
 
+# Redirect stdout to /dev/null
+# used to not display Copied file message
+sys.stdout = open(os.devnull, 'w')
+
+# Restore stdout
+# sys.stdout = sys.__stdout__
 
 def find_directory():
     '''
@@ -65,7 +72,7 @@ def group_files(directory):
             else:
                 module_list.pop(0)
             if len(module_list) >= 16:
-                bus_folder = 'bus_' + str(count) + '/'
+                bus_folder = 'bus_' + mod_num + '/'
                 if not os.path.exists(os.path.join(directory, bus_folder)):
                     os.makedirs(os.path.join(directory, bus_folder))
                 else:
@@ -271,34 +278,63 @@ def compare_file_mods(directory):
             bus_to_modules[bus_key] = df_3
     return bus_to_modules
 
-
 def filter_false_module(directory):
     file_list = []
     get_bus = compare_file_mods(directory)
-    bus_file_num = count_bus_file(directory)
-    for i in range(1, bus_file_num):
-        num = 'bus_'+str(i)
-        bus = get_bus[num]
-        for i in range(len(bus.columns)):
-            if len(bus.columns) < 2:
-                pass
-            else:
-                file_list.append(num)
-    False_list = np.unique(file_list)
-    return False_list
+    for folder_name in os.listdir(directory):
+        if os.path.isdir(os.path.join(directory, folder_name)):
+            match = re.match(r'bus_\w+', folder_name)
+            if match:
+                bus = get_bus.get(folder_name, None)
+                if bus is not None and len(bus.columns) >= 2:
+                    file_list.append(folder_name)
+    return np.unique(file_list)
 
 
 def move_false_bus(directory):
     False_list = filter_false_module(directory)
     source = directory
-    destination = directory + 'Cleaned_Buses'
+    destination = os.path.join(directory, 'vis_buses')
     if not os.path.exists(destination):
         os.makedirs(destination)
-    else:
-        pass
-    for bus_num in False_list:
-        bus_file = source + bus_num
-        shutil.move(bus_file, destination)
+    for bus_name in False_list:
+        random_part = re.search(r'bus_\w+', bus_name).group()
+        bus_folder = os.path.join(source, bus_name)
+        shutil.move(bus_folder, os.path.join(destination, random_part))
+
+# def filter_false_module(directory):
+#     file_list = []
+#     get_bus = compare_file_mods(directory)
+#     bus_file_num = count_bus_file(directory)
+#     for i in range(1, bus_file_num):
+#         num = 'bus_'+str(i)
+#         bus = get_bus[num]
+#         for i in range(len(bus.columns)):
+#             if len(bus.columns) < 2:
+#                 pass
+#             else:
+#                 file_list.append(num)
+#     False_list = np.unique(file_list)
+#     return False_list
+
+
+# def move_false_bus(directory):
+#     False_list = filter_false_module(directory)
+#     source = directory
+#     destination = os.path.join(directory, 'Cleaned_Buses')
+#     if not os.path.exists(destination):
+#         os.makedirs(destination)
+#     else:
+#         pass
+#     for bus_name in False_list:
+#         # Extract the random part of the bus name
+#         random_part = re.search(r'bus_\w+', bus_name).group()
+       
+#         # Set the path to the current bus folder
+#         bus_folder = os.path.join(source, bus_name)
+        
+#         # Move the bus folder to the destination directory
+#         shutil.move(bus_folder, os.path.join(destination, random_part))
 
 def copy_csv_to_sorted_data():
     """
