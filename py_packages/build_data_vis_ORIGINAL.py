@@ -18,13 +18,7 @@ def find_directory():
 
 
 def sort_bus_by_date(directory, bus_num):
-    ''' 
-    Creates a DataFrame of bus files sorted by the date they were retrieved. 
-    
-    Parameters:
-    - directory (str): The directory where the bus files are located.
-    - bus_num (str): The desired bus, written as "bus_" followed by the bus serial number.
-    '''
+    ''' input bus_num as string with number of bus desired'''
     # find directory of bus from sorted files
     bus_directory = directory + bus_num
 
@@ -50,7 +44,6 @@ def sort_bus_by_date(directory, bus_num):
                             list_of_dates.append(element)
                 except IndexError:
                     pass  # some files have no data
-                    
     # pull out the 'Date Retrieved' and @ symbol from the date column
     for i in range(len(list_of_dates)):
         date = list_of_dates[i]
@@ -69,19 +62,7 @@ def sort_bus_by_date(directory, bus_num):
 
 
 def build_bus_df(directory, bus_num, keyword):
-    '''
-    Creates a DataFrame for a desired bus that displays one of three variables 
-    (Current, Voltage, or Power) with the time, in seconds, the bus has spent 
-    in discrete intervals for the chosen variable.
-    
-    Parameters:
-    - directory (str): The directory where the files can be found.
-    - bus_num (str): The desired bus, written as "bus_" followed by the bus serial number.
-    - keyword (str): Keyword for the desired variable to display ('Current', 'Voltage', or 'Power').
-    '''
     bus_dates = sort_bus_by_date(directory, bus_num)
-
-    # Check for desired variable
     if keyword == 'Current':
         row_list = list(range(19)) + list(range(20, 960))
         index_range = list(range(0, 18)) + list(range(19, 960))
@@ -95,15 +76,13 @@ def build_bus_df(directory, bus_num, keyword):
         print("Keyword entered in error."
               "Please select from 'Current', 'Voltage', or 'Power'.")
 
-    dfs = []
+    bus_parameter = pd.DataFrame()
     for i in range(len(bus_dates)):
         file = bus_dates['Filename'].loc[i]
         file_dir = directory + bus_num + file
         tmp = pd.read_csv(file_dir, header=None, skiprows=row_list)
-        dfs.append(tmp)
-
-    bus_parameter = pd.concat(dfs, ignore_index=True)
-    df_index = pd.read_csv(file_dir, header=0, skiprows=index_range)
+        bus_parameter = bus_parameter.append(tmp)    
+        df_index = pd.read_csv(file_dir, header=0, skiprows=index_range)
     bus_parameter.columns = df_index.columns
 
     loc_parameter = bus_parameter.columns.str.contains('^Unnamed')
@@ -114,20 +93,6 @@ def build_bus_df(directory, bus_num, keyword):
 
 
 def build_module_df(directory, bus_num, module_num):
-    '''
-    Creates a DataFrame of voltages from one module with the rows sequential in time.
-    
-    Parameters:
-    - directory (str): The directory containing the bus files.
-    - bus_num (str): The desired bus directory.
-    - module_num (int): The integer module number (between 1 and 16).
-    
-    Note:
-    - The module data within the csv files is further subdivided into 12 submodules. 
-      Therefore, this function will output 12 rows for each date retrieved within the bus folder.
-      For example, running this function on bus 1 module 1 should return a DataFrame with 216 rows.
-      Rows 0-11 correspond to the first date in the bus folder, then rows 12-24 to the next date, etc.
-    '''
     bus_dates = sort_bus_by_date(directory, bus_num)
     start_row = 51 + (11+47) * (module_num - 1)
     end_row = start_row + 12
@@ -139,7 +104,7 @@ def build_module_df(directory, bus_num, module_num):
         file = bus_dates['Filename'].loc[i]
         file_dir = directory + bus_num + file
         tmp = pd.read_csv(file_dir, header=None, skiprows=row_list)
-        module_df = pd.concat([module_df, tmp], ignore_index=True)
+        module_df = module_df.append(tmp)
     df_index = pd.read_csv(file_dir, header=0, skiprows=index_range)
     module_df.columns = df_index.columns
 
@@ -149,47 +114,7 @@ def build_module_df(directory, bus_num, module_num):
     return module_df
 
 
-def build_module_temp(directory, bus_num, module_num):
-    '''
-    Creates a DataFrame of temperatures from one module with the rows sequential in time.
-    
-    Parameters:
-    - directory (str): The directory containing the bus files.
-    - bus_num (str): The desired bus directory.
-    - module_num (int): The integer module number (between 1 and 16).
-    '''
-    bus_dates = sort_bus_by_date(directory, bus_num)
-    start_row = 83 + (11+47) * (module_num - 1)
-    end_row = start_row + 2
-    row_list = list(range(start_row)) + list(range(end_row, 960))
-    index_range = list(range(82)) + list(range(83, 960))
-
-    module_temp = pd.DataFrame()
-    for i in range(len(bus_dates)):
-        file = bus_dates['Filename'].loc[i]
-        file_dir = directory + bus_num + file
-        tmp = pd.read_csv(file_dir, header=None, skiprows=row_list)
-        module_temp = pd.concat([module_temp, tmp], ignore_index=True)
-    df_index = pd.read_csv(file_dir, header=0, skiprows=index_range)
-    module_temp.columns = df_index.columns
-
-    module_temp = module_temp.loc[:, ~module_temp.columns.str.contains('^Unnamed')]
-    module_temp.reset_index(drop=True, inplace=True)
-    
-    return module_temp
-
-
 def build_module_average_df(directory, bus_num, module_num):
-    '''
-    Creates a DataFrame of voltages from one module with the rows sequential in time.
-    Similar to build_module_df, but averages the submodule data together to return 
-    only one row for each date for the module specified. 
-    
-    Parameters:
-    - directory (str): The directory containing the bus files.
-    - bus_num (str): The desired bus directory.
-    - module_num (int): The integer module number (between 1 and 16).
-    '''
     bus_dates = sort_bus_by_date(directory, bus_num)
     start_row = 51 + (11+47) * (module_num-1)
     end_row = start_row + 12
@@ -203,42 +128,24 @@ def build_module_average_df(directory, bus_num, module_num):
         tmp = pd.read_csv(file_dir, header=None, skiprows=row_list)
         tmp = tmp.dropna(axis=1)
         tmp = tmp.drop(0, axis=1)
-        tmp_ave = tmp.mean().to_frame().transpose()  # Convert tmp_ave to a DataFrame with one row
-        module_average_df = pd.concat([module_average_df, tmp_ave], ignore_index=True)
+        tmp_ave = tmp.mean()
+        module_average_df = module_average_df.append(tmp_ave,
+                                                     ignore_index=True)
 
-    # Once the loop completes, you can set the column names as before
     df_index = pd.read_csv(file_dir, header=0, skiprows=index_range)
     df_index = df_index.loc[:, ~df_index.columns.str.contains('^Unnamed')]
     module_average_df.columns = df_index.columns
     module_average_df.reset_index(drop=True, inplace=True)
-
-    # Define 'string' here or adjust it based on your data
     string = 'DateRetrieved'
-
-    # Concatenate the 'DateRetrieved' column to module_average_df_final
-    module_average_df_final = pd.concat([module_average_df, bus_dates[string].astype(str)], axis=1)
+    module_average_df_final = pd.concat([module_average_df,
+                                        bus_dates[string].astype(str)],
+                                        axis=1)
     module_average_df_final = module_average_df_final.set_index(string)
 
     return module_average_df_final
 
 
 def visualize_mod_time(directory, bus_num, module_num):
-    '''
-    Visualizes the distribution of time spent at each voltage in the voltage range 
-    for a given module. Running this function returns a graph with 12 plotted 
-    lines, one for each individual date in a given bus, where the x axis is voltage 
-    and the y axis is time in seconds. A dropdown menu allows selection of a specific 
-    date. Selected date remains in color, other dates are rendered gray. Axes are 
-    scalable by clicking & dragging or by mouse scroll.
-    
-    Parameters:
-    - directory (str): The directory where the files can be found.
-    - bus_num (str): The desired bus, written as "bus_" followed by the bus serial number.
-    - module_num (int): The integer module number (between 1 and 16).
-
-    Returns:
-    - line (Altair Chart Object): Altair chart displaying the visualization.
-    '''
     df = build_module_average_df(directory, bus_num, module_num)
     df = df.reset_index()
     data = df.melt('DateRetrieved', var_name='voltage', value_name='counts')
@@ -246,7 +153,7 @@ def visualize_mod_time(directory, bus_num, module_num):
 
     brush = alt.selection_interval(bind='scales')
     input_dropdown = alt.binding_select(options=dates)
-    selection = alt.selection_point(fields=['DateRetrieved'],
+    selection = alt.selection_single(fields=['DateRetrieved'],
                                      bind=input_dropdown,
                                      name=' ')
     color = alt.condition(selection,
@@ -258,7 +165,7 @@ def visualize_mod_time(directory, bus_num, module_num):
         y='counts:Q',
         color=color,
         tooltip='Name:N'
-    ).add_params(
+    ).add_selection(
         brush,
         selection
     )
@@ -268,11 +175,9 @@ def visualize_mod_time(directory, bus_num, module_num):
 
 def count_mod_changes(directory):
     '''
-    Counts changes in modules sequentially for each bus over all CSV files for all buses. 
-    Outputs a DataFrame that is used for heatmap visualizations.
-    
-    Parameters:
-    - directory (str): The directory where the files sorted by bus can be found.
+    Counts changes in modules sequentially for a bus
+    over all CSV files for all buses.
+    Outputs dataframe that is used for heatmap visualizations.
     '''
     keyword = 'Mfg Data (ASCII)'
     list_bus_nums = []  # To get the name of bus number folders
@@ -407,23 +312,12 @@ def count_mod_changes(directory):
 
 
 def visualise_mod_changes(directory):
-    '''
-    Uses the count_mod_changes output to produce a heatmap for all buses in the directory, 
-    indicating when the modules have been changed (with a color change indicating the module 
-    has been changed). The heatmap includes a drop-down menu to select the desired bus to view.
-    
-    Parameters:
-    - directory (str): The directory where the files can be found.
-
-    Returns:
-    - chart (Altair Chart Object): Altair chart displaying the heatmap.
-    '''
     df1 = count_mod_changes(directory)
     data = df1.melt(id_vars=['Bus', 'Module', 'Date'])
     buses = list(data['Bus'].unique())
     alt.data_transformers.disable_max_rows()
-    select_bus = alt.selection_point(
-        name='Select', fields=['Bus'],
+    select_bus = alt.selection_single(
+        name='Select', fields=['Bus'], init={'Bus': 1},
         bind=alt.binding_select(options=buses)
     )
 
@@ -431,23 +325,12 @@ def visualise_mod_changes(directory):
         x=alt.X('Date', title="Date", sort=None),
         y=alt.Y('Module', title="Module", sort=None),
         color=alt.Color('value', legend=None)
-    ).add_params(select_bus).transform_filter(select_bus)
+    ).add_selection(select_bus).transform_filter(select_bus)
 
     return chart
     
     
 def mod_change_statistics(directory):
-    '''
-    Uses the count_mod_changes output to calculate and graph statistics on how often a 
-    given module is changed across all of the bus data. This allows us to see if module 
-    position has an effect on the frequency of module failure.
-    
-    Parameters:
-    - directory (str): The directory where the files can be found.
-
-    Returns:
-    - chart (Matplotlib Axes Object): Bar chart displaying the average times each module is changed.
-    '''
     df1 = count_mod_changes(directory)
     grouped_times_changed = df1.groupby(['Bus', 'Module'], sort=None)['Change'].max()
     average_times_changed = grouped_times_changed.groupby(['Module'], sort=None).mean()
@@ -459,12 +342,6 @@ def mod_change_statistics(directory):
 
 
 def find_replaced_modules(directory):
-    '''
-    Makes a DataFrame showing the bus, module number and the number of times the module has been changed.
-    
-    Parameters:
-    - directory (str): The directory where the files can be found, sorted by bus.
-    '''
     serial_index = 17
     bus_swapped_mods = {}
     # Storing modules that have been swapped with each bus number
@@ -571,16 +448,9 @@ def find_replaced_modules(directory):
 
 def swapped_mod_dataframes(directory, serial_num, characteristic):
     '''
-    Makes a DataFrame for a specific characteristic (Cell Voltage, Balancers, Temperature, Module Voltages) of
-    a desired module, containing each bus file in which the module's serial number occurs (across buses).
-    
-    Parameters:
-    - directory (str): The directory where the files can be found.
-    - serial_num (str): The serial number corresponding to a specific module.
-    - characteristic (str): The module characteristic ('cell voltages', 'balancers', 'temperatures', 'module voltages').
-
-    Returns:
-    - list_desired_dfs (list): A list of DataFrames for the provided characteristic specific to the provided module.
+    Given a module characteristic and a serial number corresponding to
+    a specific module, return dataframes for that characteristic specific to
+    the provided module for each file in which that serial number occurs.
     '''
     serial_index = 17
     mod_num = re.sub(r'\W+', '', serial_num).upper()
