@@ -9,12 +9,10 @@ import zipfile
 from os import listdir
 import sys
 
-# Redirect stdout to /dev/null
-# used to not display Copied file message
+    # Redirect stdout to /dev/null
+    # used to not display Copied file message
 sys.stdout = open(os.devnull, 'w')
 
-# Restore stdout
-# sys.stdout = sys.__stdout__
 
 def find_directory():
     '''
@@ -302,39 +300,6 @@ def move_false_bus(directory):
         bus_folder = os.path.join(source, bus_name)
         shutil.move(bus_folder, os.path.join(destination, random_part))
 
-# def filter_false_module(directory):
-#     file_list = []
-#     get_bus = compare_file_mods(directory)
-#     bus_file_num = count_bus_file(directory)
-#     for i in range(1, bus_file_num):
-#         num = 'bus_'+str(i)
-#         bus = get_bus[num]
-#         for i in range(len(bus.columns)):
-#             if len(bus.columns) < 2:
-#                 pass
-#             else:
-#                 file_list.append(num)
-#     False_list = np.unique(file_list)
-#     return False_list
-
-
-# def move_false_bus(directory):
-#     False_list = filter_false_module(directory)
-#     source = directory
-#     destination = os.path.join(directory, 'Cleaned_Buses')
-#     if not os.path.exists(destination):
-#         os.makedirs(destination)
-#     else:
-#         pass
-#     for bus_name in False_list:
-#         # Extract the random part of the bus name
-#         random_part = re.search(r'bus_\w+', bus_name).group()
-       
-#         # Set the path to the current bus folder
-#         bus_folder = os.path.join(source, bus_name)
-        
-#         # Move the bus folder to the destination directory
-#         shutil.move(bus_folder, os.path.join(destination, random_part))
 
 def copy_csv_to_sorted_data():
     """
@@ -379,3 +344,14 @@ else:
 group_files(unzip_directory)
 filter_false_module(unzip_directory)
 move_false_bus(unzip_directory)
+
+# Restore stdout
+sys.stdout = sys.__stdout__
+
+current_path =  find_directory() + "sorted_data/vis_buses"
+destination_path = find_directory() + "vis_buses"
+
+shutil.move(current_path, destination_path)
+
+   
+
