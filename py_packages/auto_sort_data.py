@@ -7,24 +7,36 @@ import re
 import shutil
 import zipfile
 from os import listdir
-
+import sys
 
 def find_directory():
-    '''
+    """
     Assuming your python file is in the directory containing KCM data files,
     returns a path to that directory with an additional
     forward slash for future concatenation processes.
-    '''
+    
+    Returns:
+    str: The absolute path of the current directory formatted for concatenation.
+    """
     path = pathlib.Path().absolute()
     directory = str(path) + '/'
     return directory
 
 
 def grab_csv(directory):
-    '''
+    """
     Returns a list of all csv files in an existing directory.
     Ignoring the lone xlsx file for now, as reader fails to read this file.
-    '''
+    
+    Parameters:
+    directory (str): The path to the directory to be scanned for '.csv' files.
+
+    Returns:
+    list: A list of filenames (str) that end with '.csv'.
+
+    Note:
+    The function is designed to ignore any '.xlsx' files present in the directory.
+    """
     list_of_csv = []
     for filename in listdir(directory):
         if (filename.endswith('.csv')):  # or filename.endswith('.xlsx')):
@@ -35,11 +47,27 @@ def grab_csv(directory):
 
 
 def group_files(directory):
-    '''
+    """
     Finds serial numbers for all modules of a each file in a directory and
     groups CSV files with matching serials into
     individual bus directories.
-    '''
+
+    Parameters:
+    directory (str): The path to the directory containing the CSV files to be organized.
+
+    Returns:
+    None
+
+    Side effects:
+    - Creates 'bus' subdirectories for files with matching serial numbers.
+    - Moves files without matching serial numbers to an 'incomplete' subdirectory.
+    - Renames files to include the serial number as a prefix.
+
+    Note:
+    The function assumes that each file contains a list of serial numbers, and a file is considered
+    complete if it has at least 16 serial numbers. The serial numbers are extracted from a specific
+    keyword field in the file's content.
+    """
     keyword = 'Mfg Data (ASCII)'
     count = 1
     list_of_csv = grab_csv(directory)
@@ -65,7 +93,7 @@ def group_files(directory):
             else:
                 module_list.pop(0)
             if len(module_list) >= 16:
-                bus_folder = 'bus_' + str(count) + '/'
+                bus_folder = 'bus_' + mod_num + '/'
                 if not os.path.exists(os.path.join(directory, bus_folder)):
                     os.makedirs(os.path.join(directory, bus_folder))
                 else:
@@ -121,7 +149,20 @@ def group_files(directory):
 
 
 def count_bus_file(directory):
-    # directory = get_directory()
+    """
+    Count the number of files in a given directory that contain the substring 'bus_'
+    but are not named 'sort_bus_by_date'.
+
+    Parameters:
+    directory (str): The path to the directory where files are located.
+
+    Returns:
+    int: The count of files that match the criteria.
+
+    Note:
+    This function does not recursively search through subdirectories.
+    """
+    #directory = get_directory()
     list = []
     for file in listdir(directory):
         substring = 'bus_'
@@ -135,8 +176,23 @@ def count_bus_file(directory):
 
 
 def sort_bus_by_date(directory, bus_num):
-    ''' input bus_num as string with number of bus desired'''
+    """
+    Sort and return a DataFrame of CSV files by the date retrieved for a specific bus number.
+    This function locates the directory corresponding to the provided bus number, identifies all CSV files within it,
+    and extracts the 'Date Retrieved' information from each file. It then creates a DataFrame with filenames and their
+    respective retrieval dates, and sorts this DataFrame in ascending order of the dates.
 
+    Parameters:
+    directory (str): The path to the parent directory containing subdirectories for each bus.
+    bus_num (str): The bus number as a string, specifying the subdirectory to search within.
+
+    Returns:
+    pandas.DataFrame: A DataFrame with two columns, 'Filename' and 'DateRetrieved', sorted by 'DateRetrieved'.
+
+    Note:
+    The function assumes that the 'Date Retrieved' information is located after a specific substring within the file's  content.
+    It also assumes that the date format is consistent across files and can be converted to datetime objects for sorting.
+    """
     # find directory of bus from sorted files
     bus_directory = directory + bus_num
 
@@ -180,12 +236,26 @@ def sort_bus_by_date(directory, bus_num):
 
 
 def compare_file_mods(directory):
-    '''
+    """
+    Compare module serial numbers across CSV files within each 'bus' subdirectory.
     Returns a dictionary of bus numbers as keys and
     concatenated pandas dataframe comparing modules between each CSV file
     and its subsequent number. CSV files are
     ordered by date that data was retrieved.
-    '''
+
+    Parameters:
+    directory (str): The path to the directory containing 'bus' subdirectories with CSV files.
+
+    Returns:
+    dict: A dictionary where each key is a 'bus' subdirectory name and each value is a DataFrame
+          representing the comparison of module serial numbers between consecutive CSV files.
+
+    Note:
+    The function assumes that the module serial numbers are located after a specific keyword within the file's content.
+    It also assumes that there are at least 16 module serial numbers in each file to be considered for comparison.
+    If a 'bus' subdirectory contains only one CSV file, the function returns a DataFrame with all True values,
+    indicating no comparison is possible.
+    """
     list_bus_nums = []
     bus_to_ordered_csvs = {}
     bus_to_modules = {}
@@ -271,38 +341,136 @@ def compare_file_mods(directory):
             bus_to_modules[bus_key] = df_3
     return bus_to_modules
 
-
 def filter_false_module(directory):
+    """ 
+    Uses the output from the 'compare_file_mods' function to check each 'bus' subdirectory within
+    the specified directory. It identifies subdirectories where the comparison DataFrames have at least two columns,
+    indicating that there are at least two CSV file comparisons. It then filters for those subdirectories that contain
+    any false matches in the module serial numbers and returns a list of unique subdirectory names.
+
+    Parameters:
+    directory (str): The path to the directory containing 'bus' subdirectories with comparison DataFrames.
+
+    Returns:
+    numpy.ndarray: An array of unique 'bus' subdirectory names that have at least two CSV file comparisons
+                   with false module matches.
+
+    Note:
+    The function assumes that the 'compare_file_mods' function is available and returns a dictionary where
+    each key is a 'bus' subdirectory name and each value is a DataFrame representing the comparison of module
+    serial numbers between consecutive CSV files.
+    """
     file_list = []
     get_bus = compare_file_mods(directory)
-    bus_file_num = count_bus_file(directory)
-    for i in range(1, bus_file_num):
-        num = 'bus_'+str(i)
-        bus = get_bus[num]
-        for i in range(len(bus.columns)):
-            if len(bus.columns) < 2:
-                pass
-            else:
-                file_list.append(num)
-    False_list = np.unique(file_list)
-    return False_list
+    for folder_name in os.listdir(directory):
+        if os.path.isdir(os.path.join(directory, folder_name)):
+            match = re.match(r'bus_\w+', folder_name)
+            if match:
+                bus = get_bus.get(folder_name, None)
+                if bus is not None and len(bus.columns) >= 2:
+                    file_list.append(folder_name)
+    return np.unique(file_list)
 
 
 def move_false_bus(directory):
+    """
+    Move 'bus' subdirectories with false module matches to a 'vis_buses' subdirectory.
+    This function identifies 'bus' subdirectories that contain false module matches using the
+    'filter_false_module' function. It then moves these subdirectories into a separate 'vis_buses'
+    subdirectory within the given directory for further investigation or visualization.
+
+    Parameters:
+    directory (str): The path to the directory containing 'bus' subdirectories.
+
+    Returns:
+    None
+
+    Side effects:
+    - Creates a 'vis_buses' subdirectory within the given directory if it does not exist.
+    - Moves identified 'bus' subdirectories with false module matches into the 'vis_buses' subdirectory.
+
+    Note:
+    The function assumes that the 'filter_false_module' function is available and returns a list of
+    'bus' subdirectory names that contain false module matches.
+    """
     False_list = filter_false_module(directory)
     source = directory
-    destination = directory + 'Cleaned_Buses'
+    destination = os.path.join(directory, 'vis_buses')
     if not os.path.exists(destination):
         os.makedirs(destination)
-    else:
-        pass
-    for bus_num in False_list:
-        bus_file = source + bus_num
-        shutil.move(bus_file, destination)
+    for bus_name in False_list:
+        random_part = re.search(r'bus_\w+', bus_name).group()
+        bus_folder = os.path.join(source, bus_name)
+        shutil.move(bus_folder, os.path.join(destination, random_part))
 
 
+def copy_csv_to_sorted_data():
+    """
+    Copies CSV files from a folder called 'KCM-Raw-Data' and pastes them into a folder called 'sorted_data'.
+    This function looks for CSV files in the 'KCM-Raw-Data' subfolder located within the 'sorted_data' directory.
+    It then copies each CSV file to the parent 'sorted_data' folder. If the 'sorted_data' folder does not exist,
+    the function will create it before proceeding with the file copying process.
+
+    Side effects:
+    - If the 'sorted_data' folder does not exist, it is created.
+    - CSV files from the 'KCM-Raw-Data' subfolder are copied to the 'sorted_data' folder.
+    - The function prints out the names of the files as they are copied.
+
+    Note:
+    The function assumes that the 'sorted_data/KCM-Raw-Data' path is correct and accessible.
+    It also assumes that the 'sorted_data' directory is the intended destination for the CSV files.
+    """
+    # Define paths
+    source_folder = 'sorted_data/KCM-Raw-Data'
+    destination_folder = 'sorted_data'
+    
+    # Create destination folder if it doesn't exist
+    if not os.path.exists(destination_folder):
+        os.makedirs(destination_folder)
+    
+    # Iterate over files in the source folder
+    for file_name in os.listdir(source_folder):
+        if file_name.endswith('.csv'):
+            # Construct paths for source and destination files
+            source_file_path = os.path.join(source_folder, file_name)
+            destination_file_path = os.path.join(destination_folder, file_name)
+            
+            # Copy file to the destination folder
+            shutil.copyfile(source_file_path, destination_file_path)
+            #print(f"Copied: {file_name} to {destination_folder}")
+
+
+"""
+This script processes a collection of CSV files related to KCM data. It performs several operations
+to organize, sort, and filter the data files based on specific criteria related to bus module serial numbers.
+
+The script follows these steps:
+1. Defines paths for raw data, unzipped sorted data, and a specific subfolder within the sorted data.
+2. Checks if the unzipped sorted data directory exists:
+   - If it does, it filters out and moves 'bus' subdirectories with false module matches.
+   - If it doesn't, it unzips the raw data into the sorted data directory.
+3. Copies CSV files from a subfolder to the main sorted data folder if the subfolder exists.
+4. Groups files in the unzipped directory based on matching serial numbers and moves incomplete files.
+5. Filters and moves 'bus' subdirectories with false module matches again after grouping.
+6. Moves the 'vis_buses' subdirectory from within 'sorted_data' to the main directory level.
+
+The script assumes that the necessary functions are defined elsewhere in the codebase or are being imported.
+These functions include:
+- `find_directory()`: Returns the current directory path formatted for concatenation.
+- `filter_false_module(directory)`: Filters 'bus' subdirectories with false module matches.
+- `move_false_bus(directory)`: Moves identified 'bus' subdirectories to a 'vis_buses' subdirectory.
+- `group_files(directory)`: Groups CSV files by matching serial numbers into 'bus' subdirectories.
+- `copy_csv_to_sorted_data()`: Copies CSV files from a specific subfolder to the main sorted data folder.
+
+Note:
+The script is designed to be used in an environment where the directory structure and file naming conventions
+are consistent with those specified in the script. It also assumes that the 'KCM-Raw-Data.zip' file is located
+in the 'Raw Data' directory.
+"""
 directory = find_directory() + 'Raw Data/'
 unzip_directory = find_directory() + 'sorted_data/'
+annoyingfolder = unzip_directory + 'KCM-Raw-Data/'
+
 if os.path.exists(unzip_directory):
     filter_false_module(unzip_directory)
     move_false_bus(unzip_directory)
@@ -311,6 +479,19 @@ else:
     zip_directory = directory + zip_filename
     with zipfile.ZipFile(zip_directory, 'r') as zip_ref:
         zip_ref.extractall(unzip_directory)
-    group_files(unzip_directory)
-    filter_false_module(unzip_directory)
-    move_false_bus(unzip_directory)
+    if os.path.exists(annoyingfolder):
+        copy_csv_to_sorted_data()
+    else:
+        pass
+group_files(unzip_directory)
+filter_false_module(unzip_directory)
+move_false_bus(unzip_directory)
+
+
+current_path =  find_directory() + "sorted_data/vis_buses"
+destination_path = find_directory() + "vis_buses"
+
+shutil.move(current_path, destination_path)
+
+   
+
