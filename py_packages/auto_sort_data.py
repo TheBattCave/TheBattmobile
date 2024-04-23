@@ -493,5 +493,19 @@ destination_path = find_directory() + "vis_buses"
 
 shutil.move(current_path, destination_path)
 
-   
+vis_path = find_directory() + 'vis_buses'
+sorted_path = find_directory() + "sorted_data"
+all_folder = find_directory() + "all_buses"  
+
+shutil.copytree(vis_path, all_folder)
+
+for root, dirs, files in os.walk(sorted_path):
+    for dir_name in dirs:
+        # Check if the folder name starts with 'bus_'
+        if dir_name.startswith('bus_'):
+            # Construct paths for source and destination folders
+            src_folder = os.path.join(root, dir_name)
+            dst_folder = os.path.join(all_folder, dir_name)
+            # Copy the folder to all_data
+            shutil.copytree(src_folder, dst_folder)  
 
