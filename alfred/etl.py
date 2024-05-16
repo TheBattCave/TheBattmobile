@@ -141,7 +141,7 @@ def group_files(directory):
                 count += 1
             else:
                 moved_files.append(filename)
-                incomplete = os.path.join(directory + 'incomplete/')
+                incomplete = os.path.join(directory + 'incomplete_test/')
                 if not os.path.exists(incomplete):
                     os.makedirs(os.path.join(incomplete))
                 destination = incomplete + filename
@@ -423,7 +423,6 @@ def copy_csv_to_sorted_data():
     # Define paths
     source_folder = 'sorted_data/KCM-Raw-Data'
     destination_folder = 'sorted_data'
-    
     # Create destination folder if it doesn't exist
     if not os.path.exists(destination_folder):
         os.makedirs(destination_folder)
@@ -453,6 +452,7 @@ The script follows these steps:
 4. Groups files in the unzipped directory based on matching serial numbers and moves incomplete files.
 5. Filters and moves 'bus' subdirectories with false module matches again after grouping.
 6. Moves the 'vis_buses' subdirectory from within 'sorted_data' to the main directory level.
+7. Creates a new folder called all_buses which is a collection of the folders in vis_buses and non incomplete buses in sorted_data
 
 The script assumes that the necessary functions are defined elsewhere in the codebase or are being imported.
 These functions include:
@@ -467,45 +467,51 @@ The script is designed to be used in an environment where the directory structur
 are consistent with those specified in the script. It also assumes that the 'KCM-Raw-Data.zip' file is located
 in the 'Raw Data' directory.
 """
-#directory = find_directory() + 'Raw Data/'
-#unzip_directory = find_directory() + 'sorted_data/'
-#annoyingfolder = unzip_directory + 'KCM-Raw-Data/'
 
-#if os.path.exists(unzip_directory):
-    #filter_false_module(unzip_directory)
-    #move_false_bus(unzip_directory)
-#else:
-    #zip_filename = 'KCM-Raw-Data.zip'
-    #zip_directory = directory + zip_filename
-    #with zipfile.ZipFile(zip_directory, 'r') as zip_ref:
-        #zip_ref.extractall(unzip_directory)
-    #if os.path.exists(annoyingfolder):
-        #copy_csv_to_sorted_data()
-    #else:
-        #pass
-#group_files(unzip_directory)
-#filter_false_module(unzip_directory)
-#move_false_bus(unzip_directory)
+def main():
+    raw_data_folder_name = input("Enter the name of the raw data folder: ")
+    #unzip_folder_name = input("Enter the name of the folder to extract data: ")
+    zip_filename = input("Enter the name of the zip file (include .zip): ")
 
+    directory = find_directory() + raw_data_folder_name + '/'
+    unzip_directory = find_directory() + 'sorted_data/'
+    annoyingfolder = unzip_directory + 'KCM-Raw-Data/'
 
-#current_path =  find_directory() + "sorted_data/vis_buses"
-#destination_path = find_directory() + "vis_buses"
+    if os.path.exists(unzip_directory):
+        filter_false_module(unzip_directory)
+        move_false_bus(unzip_directory)
+    else:
+        zip_directory = directory + zip_filename
+        with zipfile.ZipFile(zip_directory, 'r') as zip_ref:
+            zip_ref.extractall(unzip_directory)
+        if os.path.exists(annoyingfolder):
+            copy_csv_to_sorted_data()
+        else:
+            pass
+    group_files(unzip_directory)
+    filter_false_module(unzip_directory)
+    move_false_bus(unzip_directory)
 
-#shutil.move(current_path, destination_path)
+    current_path = find_directory() + "sorted_data/vis_buses"
+    destination_path = find_directory() + "vis_buses"
+    shutil.move(current_path, destination_path)
 
-#vis_path = find_directory() + 'vis_buses'
-#sorted_path = find_directory() + "sorted_data"
-#all_folder = find_directory() + "all_buses"  
+    vis_path = find_directory() + 'vis_buses'
+    sorted_path = find_directory() + "sorted_data"
+    all_folder = find_directory() + "all_buses"
 
-#shutil.copytree(vis_path, all_folder)
+    shutil.copytree(vis_path, all_folder)
 
-#for root, dirs, files in os.walk(sorted_path):
-    #for dir_name in dirs:
-        # Check if the folder name starts with 'bus_'
-        #if dir_name.startswith('bus_'):
-            # Construct paths for source and destination folders
-            #src_folder = os.path.join(root, dir_name)
-            #dst_folder = os.path.join(all_folder, dir_name)
-            # Copy the folder to all_data
-            #shutil.copytree(src_folder, dst_folder)  
+    for root, dirs, files in os.walk(sorted_path):
+        for dir_name in dirs:
+            # Check if the folder name starts with 'bus_'
+            if dir_name.startswith('bus_'):
+                # Construct paths for source and destination folders
+                src_folder = os.path.join(root, dir_name)
+                dst_folder = os.path.join(all_folder, dir_name)
+                # Copy the folder to all_data
+                shutil.copytree(src_folder, dst_folder)
+if __name__ == "__main__":
+    main()
 
+main()

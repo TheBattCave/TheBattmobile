@@ -50,7 +50,6 @@ def sort_bus_by_date(directory, bus_num):
                             list_of_dates.append(element)
                 except IndexError:
                     pass  # some files have no data
-                    
     # pull out the 'Date Retrieved' and @ symbol from the date column
     for i in range(len(list_of_dates)):
         date = list_of_dates[i]
