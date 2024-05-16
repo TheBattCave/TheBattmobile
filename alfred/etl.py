@@ -468,7 +468,7 @@ are consistent with those specified in the script. It also assumes that the 'KCM
 in the 'Raw Data' directory.
 """
 
-def main():
+def unpack_interactive():
     raw_data_folder_name = input("Enter the name of the raw data folder: ")
     #unzip_folder_name = input("Enter the name of the folder to extract data: ")
     zip_filename = input("Enter the name of the zip file (include .zip): ")
@@ -511,7 +511,4 @@ def main():
                 dst_folder = os.path.join(all_folder, dir_name)
                 # Copy the folder to all_data
                 shutil.copytree(src_folder, dst_folder)
-if __name__ == "__main__":
-    main()
 
-main()
