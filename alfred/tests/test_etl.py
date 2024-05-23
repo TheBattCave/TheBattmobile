@@ -9,6 +9,36 @@ import alfred
 
 data_path = os.path.join(alfred.__path__[0], 'data')
 
+class Test_find_directory(unittest.TestCase):
+   
+    def setUp(self):
+            """
+            Unpack the zip
+            """
+            self.temp_dir = tempfile.mktemp()
+    
+            with zipfile.ZipFile(os.path.join(data_path, "test_data.zip")) as zip_ref:
+                zip_ref.extractall(self.temp_dir)
+    
+    def test_find_directory_ends_with_forward_slash(self):
+        directory = find_directory()
+
+        self.assertTrue(directory.endswith('/'), "Directory does not end with a forward slash")
+
+
+
+     def tearDown(self):
+            """
+            Remove .csv files
+            """
+            for file_name in os.listdir(self.temp_dir):
+                file_path = os.path.join(self.temp_dir, file_name)
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+    
+# remove test dir
+        os.rmdir(self.temp_dir)
+
 # tests on alfred.etl
 class test_ETL(unittest.TestCase):
 
@@ -16,7 +46,7 @@ class test_ETL(unittest.TestCase):
         """
         Unpack the zip
         """
-        self.temp_dir = tempfile.mktemp(prefix="alfred_")
+        self.temp_dir = tempfile.mktemp()
 
         with zipfile.ZipFile(os.path.join(data_path, "test_data.zip")) as zip_ref:
             zip_ref.extractall(self.temp_dir)
@@ -45,3 +75,4 @@ class test_ETL(unittest.TestCase):
 
         # remove test dir
         os.rmdir(self.temp_dir)
+
