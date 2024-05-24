@@ -7,4 +7,3 @@ dependencies:
   - altair
   - pandas
   - matplotlib
-  - python
