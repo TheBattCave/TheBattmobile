@@ -7,4 +7,4 @@ dependencies:
   - altair
   - pandas
   - matplotlib
-  - python=3.11
+  - python
