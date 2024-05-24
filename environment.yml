@@ -8,4 +8,3 @@ dependencies:
   - pandas
   - matplotlib
   - python=3.11
-prefix: /home/kevincao222/miniconda3/envs/alfred
