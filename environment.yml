@@ -3,7 +3,23 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - python=3.8
   - numpy
-  - altair
   - pandas
+  - scipy
   - matplotlib
+  - jupyter
+  - notebook
+  - ipykernel
+  - nbconvert
+  - nbformat
+  - sqlalchemy
+  - csvkit
+  - openpyxl
+  - xlrd
+  - altair
+  - seaborn
+  - plotly
+  - scikit-learn
+  - beautifulsoup4
+prefix: /home/kevincao222/miniconda3/envs/alfred
