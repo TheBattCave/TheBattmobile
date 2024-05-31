@@ -79,7 +79,7 @@ def group_files(directory):
         else:
             module_list = []
             source = os.path.join(directory, filename)
-            with open(directory + filename) as file_1:
+            with open(source) as file_1:
                 reader = csv.reader(file_1)
                 for row in reader:
                     for element in row:
@@ -93,12 +93,11 @@ def group_files(directory):
             else:
                 module_list.pop(0)
             if len(module_list) >= 16:
-                bus_folder = 'bus_' + mod_num + '/'
-                if not os.path.exists(os.path.join(directory, bus_folder)):
-                    os.makedirs(os.path.join(directory, bus_folder))
-                else:
-                    pass
-                destination = os.path.join(directory, bus_folder + filename)
+                bus_folder = 'bus_' + mod_num
+                bus_folder_path = os.path.join(directory, bus_folder)
+                if not os.path.exists(bus_folder_path):
+                    os.makedirs(bus_folder_path)
+                destination = os.path.join(bus_folder_path, filename)
                 moved_files.append(filename)
                 shutil.move(source, destination)
                 # Finish moving complete source file to new directory
@@ -108,7 +107,8 @@ def group_files(directory):
                         pass
                     else:
                         other_modules = []
-                        with open(directory + otherfile) as file_2:
+                        other_source = os.path.join(directory, otherfile)
+                        with open(other_source) as file_2:
                             reader = csv.reader(file_2)
                             for row in reader:
                                 for element in row:
@@ -135,18 +135,17 @@ def group_files(directory):
                 for match in list_matches:
                     # Modified from before because
                     # generally not safe to modify list as we loop
-                    source = directory + match
-                    destination = os.path.join(directory, bus_folder + match)
-                    shutil.move(source, destination)
+                    match_source = os.path.join(directory, match)
+                    match_destination = os.path.join(bus_folder_path, match)
+                    shutil.move(match_source, match_destination)
                 count += 1
             else:
                 moved_files.append(filename)
-                incomplete = os.path.join(directory + 'incomplete_test/')
+                incomplete = os.path.join(directory, 'incomplete_test')
                 if not os.path.exists(incomplete):
-                    os.makedirs(os.path.join(incomplete))
-                destination = incomplete + filename
+                    os.makedirs(incomplete)
+                destination = os.path.join(incomplete, filename)
                 shutil.move(source, destination)
-
 
 def count_bus_file(directory):
     """
