@@ -242,7 +242,7 @@ class TestCompareFileMods(unittest.TestCase):
     def test_compare_file_mods_dictionary_length(self):
         result = alfred.compare_file_mods(self.valid_directory)
         subdirs = [d for d in os.listdir(self.valid_directory) if os.path.isdir(os.path.join(self.valid_directory, d))]
-        self.assertEqual(len(result), len(subdirs)-2) # -2 to account for the .ipynb_checkpoints and incomplete subdirectories
+        self.assertEqual(len(result), len(subdirs)-1) # -1 to account for the incomplete subdirectory
 
     def test_compare_file_mods_unsorted_test_data_returns_empty_dict(self):
         result = alfred.compare_file_mods(self.invalid_directory)
