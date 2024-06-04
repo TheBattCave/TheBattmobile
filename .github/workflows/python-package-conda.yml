@@ -29,7 +29,6 @@ jobs:
 
     - name: Activate environment and run tests
       run: |
-        source activate alfred
         python -m unittest discover
 
 
