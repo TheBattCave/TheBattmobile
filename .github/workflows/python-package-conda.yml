@@ -16,17 +16,20 @@ jobs:
       with:
         auto-update-conda: true
         python-version: 3.8  # Use the same Python version as in your environment.yml
-        activate-environment: alfred
+
+    - name: Remove existing environment
+      run: |
+        conda env remove -n alfred || echo "Environment alfred does not exist"
 
     - name: Create environment
       run: conda env create -f environment.yml
 
     - name: Update environment
-      run: |
-        conda env update --file environment.yml --prune
+      run: conda env update --file environment.yml --prune
 
-    - name: Run tests
+    - name: Activate environment and run tests
       run: |
+        source activate alfred
         python -m unittest discover
 
 
