@@ -14,6 +14,21 @@ Our primary use case is King County Metro, a local transit agency that operates 
 
 As is, there is a sparsity in clean and open-source data from in-application battery packs. Parsing, cataloging, and analyzing the data collected from King County Metro’s large hybrid-electric bus fleet is useful work to the research and development community. This can aid in developing more efficient battery management systems, improved battery designs, and optimized usage strategies. For academic researchers, it provides a solid foundation for theoretical studies and innovations in battery technology, supporting advancements in energy storage solutions and sustainability.
 
+## Installation
+
+### Dependencies
+
+The "alfred" package was designed using Ubuntu 22.4 for Windows and Terminal for MAC and therefore is required when running the package. To properly install the dependencies for this package first clone this repository into your local machine. Then, create a new environment to make sure your machine has all the required dependencies to run "alfred" with the following command:
+###
+    conda env create -f environment.yml
+
+Activate this environment using:
+###
+    conda activate environment
+
+
+
+
 ## Component Design
 
 ### Extract, Transform, Load (etl.py)
