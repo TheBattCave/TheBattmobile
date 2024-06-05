@@ -1,33 +1,32 @@
-name: Python Package using Conda
+name: Python application
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  build-linux:
+  build:
+
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 5
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v3
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v2
       with:
-        python-version: '3.11'
-    - name: Add conda to system path
+        auto-update-conda: true
+        python-version: 3.8  # Use the same Python version as in your environment.yml
+
+    - name: Remove existing environment
       run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-    - name: Install dependencies
+        conda env remove -n alfred || echo "Environment alfred does not exist"
+
+    - name: Create environment
+      run: conda env create -f environment.yml
+
+    - name: Update environment
+      run: conda env update --file environment.yml --prune
+
+    - name: Run tests
       run: |
-        conda env update --file environment.yml --name base
-    - name: Lint with flake8
-      run: |
-        conda install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics  --exit-zero
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics  --exit-zero
-    - name: Test with unittest
-      run: |
-        python -m unittest discover
+        conda run -n alfred python -m unittest discover

@@ -141,7 +141,7 @@ def group_files(directory):
                 count += 1
             else:
                 moved_files.append(filename)
-                incomplete = os.path.join(directory, 'incomplete_test')
+                incomplete = os.path.join(directory, 'incomplete')
                 if not os.path.exists(incomplete):
                     os.makedirs(incomplete)
                 destination = os.path.join(incomplete, filename)
