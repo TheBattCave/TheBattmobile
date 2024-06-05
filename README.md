@@ -50,13 +50,17 @@ Lastly, our analysis.py module offers a suite of tools for conducting Principal 
 
 ## Architecture
 ###
-    graph TD;
-        A[TheBattmobile] -->|Contains| B[Branches];
-        A -->|Has| C[Commits];
-        B --> D[Master Branch];
-        B --> E[Feature Branch];
-        C --> F[Commit 1];
-        C --> G[Commit 2];
+        .
+        ├── alfred
+        │   ├── etl.py
+        │   └── vis.py
+        |    |
+        ├── doc
+        │   ├── test_main.py
+        │   └── test_helper.py
+        ├── README.md
+        └── setup.py
+
 
 
 
