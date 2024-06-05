@@ -49,6 +49,14 @@ Our vis.py module is designed for exploring through the previously organized fol
 Lastly, our analysis.py module offers a suite of tools for conducting Principal Component Analysis (PCA) on built data frames, currently supporting voltage analysis at the module level. With features including normalization through mean centering, visualization of explained variance to aid in component selection, plotting of principle component loadings, and scatterplot visualization of data points in terms of the first two principle components, it provides users with powerful analytical capabilities. Several checks are in place to ensure the accuracy and integrity of the analysis, offering confidence in the results obtained.
 
 ## Architecture
+###
+    graph TD;
+        A[TheBattmobile] -->|Contains| B[Branches];
+        A -->|Has| C[Commits];
+        B --> D[Master Branch];
+        B --> E[Feature Branch];
+        C --> F[Commit 1];
+        C --> G[Commit 2];
 
 
 
