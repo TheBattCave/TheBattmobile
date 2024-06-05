@@ -16,7 +16,7 @@ As is, there is a sparsity in clean and open-source data from in-application bat
 
 ## Installation
 
-### Dependencies
+### Instructions
 
 The "alfred" package was designed using Ubuntu 22.4 for Windows and Terminal for MAC and therefore is required when running the package. To properly install the dependencies for this package first clone this repository into your local machine. Then, create a new environment to make sure your machine has all the required dependencies to run "alfred" with the following command:
 ###
@@ -24,7 +24,12 @@ The "alfred" package was designed using Ubuntu 22.4 for Windows and Terminal for
 
 Activate this environment using:
 ###
-    conda activate environment
+    conda activate alfred
+
+Finally, to finish installation using python, input:
+###
+        python
+        import alfred
 
 
 
