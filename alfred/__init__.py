@@ -19,5 +19,20 @@ from .vis import visualise_mod_changes
 from .vis import mod_change_statistics
 from .vis import find_replaced_modules
 from .vis import swapped_mod_dataframes
+<<<<<<< HEAD
 
 #from .analysis import
+=======
+from .vis import label_bad_module
+
+from .analysis import count_swapped_modules
+from .analysis import find_problem_buses
+from .analysis import standardize_columns
+from .analysis import build_all_voltages_df
+from .analysis import check_rows
+from .analysis import mean_center
+from .analysis import prepare_for_pca
+from .analysis import find_num_components
+from .analysis import perform_pca
+from .analysis import visualize_pca
+>>>>>>> f9913cd96e5f2f48e85db6ef0e752c4285c534ef
