@@ -1,4 +1,5 @@
 import alfred
+import unittest
 import altair as alt
 import csv
 import matplotlib.pyplot as plt
@@ -15,10 +16,10 @@ from sklearn.decomposition import PCA
 data_path = os.path.join(alfred.__path__[0], 'data/sorted_test_data')
 
 class TestCountSwappedModules(unittest.TestCase):
-  def setUp(self):
-    self.valid_directory = os.path.join(data_path, 'all_buses/')
+    def setUp(self):
+        self.valid_directory = os.path.join(data_path, 'all_buses/')
 
-  def test_count_swapped_modules_output(self):
+    def test_count_swapped_modules_output(self):
         # Capture the output of the function
         captured_output = StringIO()
         sys.stdout = captured_output
@@ -38,7 +39,7 @@ class TestCountSwappedModules(unittest.TestCase):
         self.assertIn("Count of '1':", captured_output_str)
         self.assertIn("0 = healthy and 1 = swapped", captured_output_str)
     def tearDown(self):
-      pass
+         pass
       
 if __name__ == '__main__':
     unittest.main()
