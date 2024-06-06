@@ -50,32 +50,31 @@ Lastly, our analysis.py module offers a suite of tools for conducting Principal 
 
 ## Architecture
 ###
-    TheBattmobile/
-    ├── alfred/
-    │   ├── analysis.py
-    │   ├── etl.py
-    │   ├── vis.py
-    │   └── data/
-    │   │   ├── test_data.zip
-    │   │   ├── KCM-Raw-Data.zip
+    TheBattmobile/                                    
+    ├── alfred/                         # imported software package
+    │   ├── etl.py                         # extract, order, and sort data
+    │   ├── vis.py                         # builds dataframes and visualizes data                                            
+    │   ├── analysis.py                    # runs PCA 
+    │   ├── data/
+    │   │   ├── test_data.zip             
+    │   │   ├── KCM-Raw-Data.zip           # actual data from KCM hybrid buses
     │   │   ├── sorted_test_data/
     │   │   ├── unsorted_test_data/
     │   │   │   └── incomplete/
     │   │   └── unzipped_test_data/
-    │   └── tests/
+    │   └── tests/                        # unuttests for modules
     │       ├──test_vis.py
     │       ├──test_analysis.py
-    │       └── unzipped_test_data/ test_etl.py
+    │       └──test_etl.py
     ├── examples/
-    │   ├── Example_notebook.ipynbb
+    │   ├── Example_notebook.ipynbb      # walk through of the diiferent functions alfred has to offer
     │   └── example_data/
-    │       └── KCM-Raw-Data.zip
+    │       └── KCM-Raw-Data.zip         # actual data from KCM hybrid buses
     └── doc/
         ├── diagram_battery layout.pdf
         ├── CHEME 546 final presentation.pdf
         └── Component Specs/
-            ├── Data_Breakdown.md
-            ├── Use_Cases.txt
+            ├── Data_Breakdown.md       # explanation of the bus csv data
             └── Use_Cases.md
 
 
