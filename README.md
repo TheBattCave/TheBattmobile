@@ -50,16 +50,32 @@ Lastly, our analysis.py module offers a suite of tools for conducting Principal 
 
 ## Architecture
 ###
-        .
-        ├── alfred
-        │   ├── etl.py
-        │   └── vis.py
-        |    |
-        ├── doc
-        │   ├── test_main.py
-        │   └── test_helper.py
-        ├── README.md
-        └── setup.py
+        alfred/
+        ├── analysis.py
+        ├── etl.py
+        ├── vis.py
+        └── data/
+        │   ├── test_data.zip
+        │   ├── KCM-Raw-Data.zip
+        │   ├── sorted_test_data/
+        │   ├── unsorted_test_data/
+        │   │   └── incomplete/
+        │   └── unzipped_test_data/
+        └── tests/
+            ├──test_vis.py
+            ├──test_analysis.py
+            └── unzipped_test_data/ test_etl.py
+        examples/
+        ├── Example_notebook.ipynbb
+        └── example_data/
+            └── KCM-Raw-Data.zip
+        doc/
+        ├── diagram_battery layout.pdf
+        ├── CHEME 546 final presentation.pdf
+        └── Component Specs/
+            ├── Data_Breakdown.md
+            ├── Use_Cases.txt
+            └── Use_Cases.md
 
 
 
