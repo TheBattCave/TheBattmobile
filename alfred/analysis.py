@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import pathlib
 import re
-import vis
 import shutil
 import numpy as np
 import os
 from os import listdir
 from sklearn.decomposition import PCA 
 
+from .vis import label_bad_module, build_module_average_df
 
 def count_swapped_modules(directory):
     """
@@ -25,7 +25,7 @@ def count_swapped_modules(directory):
     """
     
     # Label modules that got swapped
-    mod_labels = vis.label_bad_module(directory) 
+    mod_labels = label_bad_module(directory) 
 
     # Track counts for module labels in vis_buses
     # Initialize a dictionary to store counts
@@ -64,7 +64,7 @@ def find_problem_buses(directory):
             list_bus_nums.append(file)
 
     # Label modules that got swapped
-    mod_labels = vis.label_bad_module(directory)
+    mod_labels = label_bad_module(directory)
 
     # Grab the whole "Bus" column from the target variable dataframe, as a list
     bus_list = mod_labels['Bus'].unique().tolist()
@@ -81,7 +81,7 @@ def find_problem_buses(directory):
     for bus in bus_list:
         for i in range(1, 17):
             try:
-                result = vis.build_module_average_df(directory, bus + '/', i)
+                result = build_module_average_df(directory, bus + '/', i)
             except Exception as e:
                 count += 1
                 prob_buses.append(bus)  # Add the problematic bus to the list
@@ -124,7 +124,7 @@ def build_all_voltages_df(directory):
     """
     
     # Grab the whole "Bus" column from the target variable dataframe, as a list
-    mod_labels = vis.label_bad_module(directory)
+    mod_labels = label_bad_module(directory)
     bus_list = mod_labels['Bus'].unique().tolist()
 
     # Add 'Bus' and 'Module' columns
@@ -134,7 +134,7 @@ def build_all_voltages_df(directory):
     # Iterate over each bus and module
     for bus in bus_list:
         for i in range(1, 17):
-            ex = vis.build_module_average_df(directory, bus + '/', i)
+            ex = build_module_average_df(directory, bus + '/', i)
             standardize_columns(ex)
             volts.append(ex)
             # Get the number of rows in the DataFrame returned by build_module_average_df
@@ -218,7 +218,7 @@ def mean_center(directory):
             mean_cent.loc[idx, voltage_columns] = mean_cent.loc[idx, voltage_columns].div(total_value)
 
     # Label modules that got swapped
-    mod_labels = vis.label_bad_module(directory)
+    mod_labels = label_bad_module(directory)
 
     return mean_cent, mod_labels, voltage_columns
 
@@ -379,5 +379,3 @@ def visualize_pca(directory):
     )
 
     return chart
-
-    
