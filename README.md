@@ -20,7 +20,7 @@ As is, there is a sparsity in clean and open-source data from in-application bat
 
 The "alfred" package was designed using Ubuntu 22.4 for Windows and Terminal for MAC and therefore is required when running the package. To properly install the dependencies for this package first clone this repository into your local machine. Then, create a new environment to make sure your machine has all the required dependencies to run "alfred" with the following command:
 ###
-    conda env create -f environment.yml
+    conda env create -f gotham.yml
 
 Activate this environment using:
 ###
