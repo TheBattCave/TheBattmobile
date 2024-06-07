@@ -63,13 +63,15 @@ Lastly, our analysis.py module offers a suite of tools for conducting Principal 
     │   │   │   └── incomplete/
     │   │   └── unzipped_test_data/
     │   └── tests/                        # unuttests for modules
-    │       ├──test_vis.py
-    │       ├──test_analysis.py
-    │       └──test_etl.py
+    │       ├── test_vis.py
+    │       ├── test_analysis.py
+    │       └── test_etl.py
     ├── examples/
     │   ├── Example_notebook.ipynbb      # walk through of the diiferent functions alfred has to offer
-    │   └── example_data/
-    │       └── KCM-Raw-Data.zip         # actual data from KCM hybrid buses
+    │   ├── example_data/
+    │   │   └── KCM-Raw-Data.zip         
+    │   ├── Healthy vs Non-healthy busses.ipynb 
+    │   └── Module time time of Failure.ipynb
     └── doc/
         ├── diagram_battery layout.pdf
         ├── CHEME 546 final presentation.pdf
