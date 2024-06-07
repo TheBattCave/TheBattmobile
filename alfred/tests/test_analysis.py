@@ -41,6 +41,48 @@ class TestCountSwappedModules(unittest.TestCase):
         self.assertIn("0 = healthy and 1 = swapped", captured_output_str)
     def tearDown(self):
          pass
-      
+
+
+class TestStandardizeColumns(unittest.TestCase):
+    def setUp(self):
+        self.valid_directory = os.path.join(data_path, 'all_buses/') 
+    def test_standardize_columns(self):
+        df = alfred.count_mod_changes(self.valid_directory)
+        
+        result = alfred.standardize_columns(df)
+        
+        self.assertIsInstance(result, pd.DataFrame)
+        
+    def tearDown(self):
+         pass   
+
+class TestBuildAllVoltagesDF(unittest.TestCase):
+    def setUp(self):
+        self.valid_directory = os.path.join(data_path, 'all_buses/') 
+   
+    def test_returns_dataframe(self):
+        result = alfred.build_all_voltages_df(self.valid_directory)
+        self.assertIsInstance(result, pd.DataFrame, "The function should return a pandas DataFrame")
+        
+    def test_includes_bus_column(self):
+        result = alfred.build_all_voltages_df(self.valid_directory)
+        self.assertIn('Bus', result.columns, "The DataFrame should include a 'Bus' column")
+        
+    def test_includes_module_column(self):
+        result = alfred.build_all_voltages_df(self.valid_directory)
+        self.assertIn('Module', result.columns, "The DataFrame should include a 'Module' column")
+    def tearDown(self):
+         pass   
+
+class TestMeanCenter(unittest.TestCase):
+    def setUp(self):
+        self.valid_directory = os.path.join(data_path, 'all_buses/') 
+    
+    def test_output_is_tuple_with_three_elements(self):
+        result = alfred.mean_center(self.valid_directory)
+        self.assertIsInstance(result, tuple, "The function should return a tuple")
+        self.assertEqual(len(result), 3, "The tuple should have exactly three elements")
+    def tearDown(self):
+         pass  
 if __name__ == '__main__':
     unittest.main()
