@@ -22,10 +22,10 @@ jobs:
         conda env remove -n alfred || echo "Environment alfred does not exist"
 
     - name: Create environment
-      run: conda env create -f environment.yml
+      run: conda env create -f gotham.yml
 
     - name: Update environment
-      run: conda env update --file environment.yml --prune
+      run: conda env update --file gotham.yml --prune
 
     - name: Run tests
       run: |
