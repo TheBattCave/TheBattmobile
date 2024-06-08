@@ -78,10 +78,3 @@ Lastly, our analysis.py module offers a suite of tools for conducting Principal 
         └── Component Specs/
             ├── Data_Breakdown.md       # explanation of the bus csv data
             └── Use_Cases.md
-
-
-
-
-## Contributing
-
-
